@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Feeder</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="quiz_progress_text_remaining">%1$d points are coming your way</string>
+    <string name="quiz_progress_text_end">You won %1$d points</string>
+</resources>
