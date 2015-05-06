@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,6 +57,10 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
 
     int[] mWrongAnswersPenalties = new int[ 3 ]; // how many point can be lost for each wrong answer
 
+    private Button[] mArrayOfAnswerViews;
+
+    private ImageRequest mImageRequest;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
 
@@ -70,9 +75,13 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
         super.onResume();
         mFeedReceiver = GetFeedService.registerOnFeedItemResultListener(getActivity(), this);
         if (mFeedItem == null) {
-            getActivity().startService(GetFeedService.createNextQuizItemIntent(getActivity()));
+            getNextQuizItem();
+        }
+        else{
+            onFeedItemResult(getActivity(),mFeedItem);
         }
     }
+
 
     @Override
     public void onPause() {
@@ -82,6 +91,7 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        cancelQuiz();
         super.onPause();
     }
 
@@ -98,30 +108,25 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
         mAnswerButton2 = (Button) rootView.findViewById(R.id.quiz_answer_2);
         mAnswerButton3 = (Button) rootView.findViewById(R.id.quiz_answer_3);
 
-        mAnswerButton1.setOnClickListener(new View.OnClickListener() {
+        mArrayOfAnswerViews = new Button[ 3 ];
+        mArrayOfAnswerViews[ 0 ] = mAnswerButton1;
+        mArrayOfAnswerViews[ 1 ] = mAnswerButton2;
+        mArrayOfAnswerViews[ 2 ] = mAnswerButton3;
 
-            @Override
-            public void onClick(final View v) {
+        for (int i = 0; i < mArrayOfAnswerViews.length; i++) {
 
-                onAnswer(0);
-            }
-        });
-        mAnswerButton2.setOnClickListener(new View.OnClickListener() {
+            final int answer = i;
+            mArrayOfAnswerViews[ i ].setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(final View v) {
+                @Override
+                public void onClick(final View v) {
 
-                onAnswer(1);
-            }
-        });
-        mAnswerButton3.setOnClickListener(new View.OnClickListener() {
+                    onAnswer(answer);
+                }
+            });
+        }
 
-            @Override
-            public void onClick(final View v) {
 
-                onAnswer(2);
-            }
-        });
         return rootView;
     }
 
@@ -140,6 +145,11 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
 
     }
 
+    private void getNextQuizItem() {
+
+        getActivity().startService(GetFeedService.createNextQuizItemIntent(getActivity()));
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void revealView(View view) {
         // this groovy effect requires Android 5.0 and above
@@ -151,10 +161,8 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
             Animator reveal = ViewAnimationUtils.createCircularReveal(
                     view,           // The  View to reveal
                     Math.round(
-                            radius *
-                                    0.5f),      // x to start the mask from - start from the middle
-                    Math.round(
-                            radius),      // y to start the mask from - start from the bottom
+                            radius * 0.5f),      // x to start the mask from - start from the middle
+                    Math.round(radius),      // y to start the mask from - start from the bottom
                     0f,                          // radius of the starting mask
                     radius);                     // radius of the final mask
             reveal.setDuration(150L)
@@ -168,9 +176,10 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
 
         if (mFeedItem != null) {
             if (answerIndex != mFeedItem.getCorrectAnswerIndex()) {
-                mPointsLostOnErrors += mWrongAnswersPenalties[ answerIndex ];
-                mWrongAnswersPenalties[ answerIndex ] = 0;
-
+                computeWrongAnswerPenalty(answerIndex);
+                if (calculatePointsRemaining() <= 0) {
+                    onQuizEnded();
+                }
             }
             else {
                 onQuizEnded();
@@ -179,15 +188,25 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
 
     }
 
+    private void computeWrongAnswerPenalty(final int answerIndex) {
 
-    private void setProgress(final int quizTimeSeconds) {
+        mPointsLostOnErrors += mWrongAnswersPenalties[ answerIndex ];
+        mWrongAnswersPenalties[ answerIndex ] = 0;
+    }
 
-        if (mProgressTextView != null) {
-            mProgressTextView.setText(getResources().getString(R.string.quiz_progress_text_remaining, calculatePointsRemaining()));
-        }
 
-        if (mQuizProgressBar != null) {
-            mQuizProgressBar.setProgress(mQuizTimeSeconds);
+    private void updateQuizProgress(final int quizTimeSeconds) {
+
+        try {
+            if (mProgressTextView != null) {
+                mProgressTextView.setText(getResources().getString(R.string.quiz_progress_text_remaining, calculatePointsRemaining()));
+            }
+
+            if (mQuizProgressBar != null) {
+                mQuizProgressBar.setProgress(mQuizTimeSeconds);
+            }
+        } catch (Resources.NotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -199,41 +218,74 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
     private void onQuizEnded() {
 
 
+        synchronized (this) {
+            mCountDownRunnable = null;
+        }
+//        resetQuiz();
+
+        for (int i = 0; i < mArrayOfAnswerViews.length; i++) {
+            mArrayOfAnswerViews[ i ].setVisibility(View.INVISIBLE);
+        }
+        mArrayOfAnswerViews[ mFeedItem.getCorrectAnswerIndex() ].setVisibility(View.VISIBLE);
+
+        getView().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+
+                getNextQuizItem();
+            }
+        }, 2000);
+    }
+
+    private void cancelQuiz() {
+
+        synchronized (this) {
+            mCountDownRunnable = null;
+        }
     }
 
     private void resetQuiz() {
 
+        if (mArrayOfAnswerViews != null) {
+            for (int i = 0; i < mArrayOfAnswerViews.length; i++) {
+                mArrayOfAnswerViews[ i ].setVisibility(View.VISIBLE);
+                mArrayOfAnswerViews[ i ].setText(null);
+            }
+        }
         mPointsLostOnErrors = 0;
         mQuizTimeSeconds = getResources().getInteger(R.integer.quiz_time);
         mWrongAnswersPenalties[ 0 ] = 2;
         mWrongAnswersPenalties[ 1 ] = 2;
         mWrongAnswersPenalties[ 2 ] = 2;
-        setProgress(mQuizTimeSeconds);
+        updateQuizProgress(mQuizTimeSeconds);
 
-        mCountDownRunnable = new Runnable() {
+        synchronized (this) {
+            mCountDownRunnable = new Runnable() {
 
-            @Override
-            public void run() {
+                @Override
+                public void run() {
 
-                if (this != mCountDownRunnable) {
-                    return; // 'this' shouldn't be running
+                    if (this != mCountDownRunnable) {
+                        return; // 'this' shouldn't be running
+                    }
+                    updateQuizProgress(mQuizTimeSeconds);
+                    if (calculatePointsRemaining() <= 0) {
+                        onQuizEnded();
+                    }
+                    else {
+                        mQuizTimeSeconds--;
+                        getView().postDelayed(this, 1000);
+                    }
                 }
-                if (calculatePointsRemaining()<=0) {
-                    onQuizEnded();
-                }
-                else {
-                    setProgress(mQuizTimeSeconds);
-                    mQuizTimeSeconds--;
-                    getView().postDelayed(this, 1000);
-                }
-            }
-        };
+            };
+        }
     }
 
 
     private void getPreviewImageForFeedItem(final FeedItem feedItem) {
 
-        ImageRequest imageRequest = new ImageRequest(feedItem.getImageUrl(),
+        mImageRequest = new ImageRequest(feedItem.getImageUrl(),
                 new Response.Listener<Bitmap>() {
 
                     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -241,9 +293,10 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
                     public void onResponse(Bitmap bitmap) {
 
                         mPreviewImageView.setVisibility(View.VISIBLE);
+                        View root = getView();
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-                                mPreviewImageView.isAttachedToWindow()) {
-                            revealView(mPreviewImageView);
+                                root.isAttachedToWindow()) {
+                            revealView(root);
                         }
                         mPreviewImageView.setImageBitmap(bitmap);
                         onImageDisplayed(feedItem);
@@ -262,7 +315,7 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
         );
 
         VolleyWrapper.getInstance(getActivity())
-                .addToRequestQueue(imageRequest);
+                .addToRequestQueue(mImageRequest);
 
 
     }
@@ -270,9 +323,11 @@ public class QuizFragment extends Fragment implements OnFeedItemResultListener {
     // preview image was displayed properly - expose the answers and start the countdown
     private void onImageDisplayed(final FeedItem feedItem) {
 
-        mAnswerButton1.setText(feedItem.getHeadlines()[ 0 ]);
-        mAnswerButton2.setText(feedItem.getHeadlines()[ 1 ]);
-        mAnswerButton3.setText(feedItem.getHeadlines()[ 2 ]);
+        int length = mArrayOfAnswerViews!=null ? mArrayOfAnswerViews.length : 0;
+        for (int i = 0; i < length; i++) {
+
+            mArrayOfAnswerViews[i].setText(feedItem.getHeadlines()[ i ]);
+        }
 
         getView().postDelayed(mCountDownRunnable, 1000);
 

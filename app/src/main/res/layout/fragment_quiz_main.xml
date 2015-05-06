@@ -10,12 +10,14 @@
     <ImageView
         android:id="@+id/quiz_preview_image"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/preview_image_height"
+        android:layout_height="0dp"
+        android:layout_weight="2.0"
         android:scaleType="centerCrop"/>
 
     <TextView
         android:layout_margin="@dimen/margin_small"
 
+        android:textAppearance="@style/QuizProgressTextAppearance"
         android:id="@+id/quiz_progress_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -26,6 +28,7 @@
         android:id="@+id/quiz_remaining_time_progress"
         style="@android:style/Widget.ProgressBar.Horizontal"
 
+        android:progressDrawable="@drawable/progress_bar"
         android:max="@integer/quiz_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

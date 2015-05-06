@@ -130,7 +130,7 @@ public class GetFeedService extends Service {
     private void broadcastNextItem() {
         boolean isSuccess = mFeed != null && mFeed.items != null && mFeed.items.length > 0;
         FeedItemImpl feedItem = isSuccess ?
-                                mFeed.items[ 0 ] :
+                                mFeed.items[ mFeedItemIndex ] :
                                 null;
 
         sendBroadcast(new Intent(ACTION_GET_FEED_ITEM_RESULT)
