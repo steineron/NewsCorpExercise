@@ -5,7 +5,6 @@ import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -56,9 +55,11 @@ public class QuizFragment extends QuizBaseFragment implements OnQuizItemImageRea
         mQuizProgressBar = (ProgressBar) rootView.findViewById(R.id.quiz_remaining_time_progress);
 
         mArrayOfAnswerViews = new Button[ 3 ];
-        mArrayOfAnswerViews[ 0 ] = (Button) rootView.findViewById(R.id.quiz_answer_1);;
-        mArrayOfAnswerViews[ 1 ] = (Button) rootView.findViewById(R.id.quiz_answer_2);;
-        mArrayOfAnswerViews[ 2 ] = (Button) rootView.findViewById(R.id.quiz_answer_3);;
+
+        mArrayOfAnswerViews[ 0 ] = (Button) rootView.findViewById(R.id.quiz_answer_1);
+        mArrayOfAnswerViews[ 1 ] = (Button) rootView.findViewById(R.id.quiz_answer_2);
+        mArrayOfAnswerViews[ 2 ] = (Button) rootView.findViewById(R.id.quiz_answer_3);
+
 
         for (int i = 0; i < mArrayOfAnswerViews.length; i++) {
 
@@ -81,20 +82,29 @@ public class QuizFragment extends QuizBaseFragment implements OnQuizItemImageRea
     public void onResume() {
 
         super.onResume();
-        mQuizImageReadyReceiver = ControllerFacade.registerOnQuizItemImageReadyListener(getActivity(),this);
+        mQuizImageReadyReceiver =
+                ControllerFacade.registerOnQuizItemImageReadyListener(getActivity(), this);
     }
 
     @Override
     public void onPause() {
 
         super.onPause();
-        if(mQuizImageReadyReceiver!=null){
+        if (mQuizImageReadyReceiver != null) {
             try {
                 getActivity().unregisterReceiver(mQuizImageReadyReceiver);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onFeedItemResult(final Context context, final QuizFeedItem item) {
+
+        super.onFeedItemResult(context, item);
+        // hide the view until the image loads
+        getView().setVisibility(View.INVISIBLE);
     }
 
     private void onAnswer(final int answerIndex, final QuizFeedItem quizFeedItem) {
@@ -157,8 +167,8 @@ public class QuizFragment extends QuizBaseFragment implements OnQuizItemImageRea
         boolean isSuccess = termination == QuizResult.QuizTermination.USER_ANSWERED;
         getActivity().sendBroadcast(
                 ControllerFacade
-                        .createOnQuizEndedIntent(
-                                QuizResultImpl.create(isSuccess, termination)));
+                        .createOnQuizEndedIntent(getQuizFeedItem(),
+                                QuizResultImpl.create(isSuccess, termination, calculatePointsRemaining())));
     }
 
 
@@ -221,18 +231,22 @@ public class QuizFragment extends QuizBaseFragment implements OnQuizItemImageRea
             mArrayOfAnswerViews[ i ].setText(quizFeedItem.getHeadlines()[ i ]);
         }
 
-        getView().postDelayed(mCountDownRunnable, 1000);
+        View view = getView();
+        view.setVisibility(View.VISIBLE);
+        view.postDelayed(mCountDownRunnable, 1000);
+        revealView(view);
 
     }
 
     @AutoParcel
     static abstract class QuizResultImpl implements QuizResult {
 
-        static QuizResultImpl create(
+        static QuizResult create(
                 boolean isSuccess,
-                @Nullable QuizTermination quizTermination) {
+                @Nullable QuizTermination quizTermination,
+                int score) {
 
-            return new AutoParcel_QuizFragment_QuizResultImpl(isSuccess, quizTermination);
+            return new AutoParcel_QuizFragment_QuizResultImpl(isSuccess, quizTermination, score);
         }
     }
 }

@@ -17,4 +17,6 @@ public interface QuizResult extends Parcelable{
 
     QuizTermination getTermination();
 
+    int getScore();
+
 }

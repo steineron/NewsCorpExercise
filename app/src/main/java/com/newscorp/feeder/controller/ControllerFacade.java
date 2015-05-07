@@ -4,7 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
+
+import com.newscorp.feeder.model.QuizFeedItem;
 
 /**
  * Created by rosteiner on 5/7/15.
@@ -22,6 +23,8 @@ public final class ControllerFacade {
     private static final String EXTRA_IMAGE_READY_IMAGE = TAG + ".EXTRA_IMAGE_READY_IMAGE";
 
     private static final String ACTION_QUIZ_ENDED = TAG + ".ACTION_QUIZ_ENDED";
+
+    private static final String EXTRA_QUIZ_FEED_ITEM = TAG + ".EXTRA_QUIZ_FEED_ITEM";
 
     private static final String EXTRA_QUIZ_END_RESULT = TAG + ".EXTRA_QUIZ_END_RESULT";
 
@@ -69,15 +72,14 @@ public final class ControllerFacade {
     }
 
 
-
-
     /**
      * HANDLING QUIZ RESULTS
      */
 
-    public static Intent createOnQuizEndedIntent(QuizResult quizResult) {
+    public static Intent createOnQuizEndedIntent(QuizFeedItem quizItem, QuizResult quizResult) {
 
         return new Intent(ACTION_QUIZ_ENDED)
+                .putExtra(EXTRA_QUIZ_FEED_ITEM, quizItem)
                 .putExtra(EXTRA_QUIZ_END_RESULT, quizResult);
     }
 
@@ -90,9 +92,10 @@ public final class ControllerFacade {
 
 
                 @Override
-                public void onQuizEnded(final Context context, final QuizResult quizResult) {
+                public void onQuizEnded(final Context context, QuizFeedItem item,
+                                        final QuizResult quizResult) {
 
-                    listener.onQuizEnded(context, quizResult);
+                    listener.onQuizEnded(context, item, quizResult);
                 }
             };
             IntentFilter filter = new IntentFilter();
@@ -108,8 +111,10 @@ public final class ControllerFacade {
         @Override
         public void onReceive(final Context context, final Intent intent) {
 
-            if (ACTION_IMAGE_READY.equals(intent.getAction())) {
-                onQuizEnded(context, (QuizResult) intent.getParcelableExtra(EXTRA_QUIZ_END_RESULT));
+            if (ACTION_QUIZ_ENDED.equals(intent.getAction())) {
+                onQuizEnded(context,
+                        (QuizFeedItem) intent.getParcelableExtra(EXTRA_QUIZ_FEED_ITEM),
+                        (QuizResult) intent.getParcelableExtra(EXTRA_QUIZ_END_RESULT));
             }
 
         }

@@ -8,7 +8,7 @@
     <TextView
         android:layout_margin="@dimen/margin_small"
 
-        android:textAppearance="@style/QuizProgressTextAppearance"
+        style="@style/QuizProgressTextAppearance"
         android:id="@+id/quiz_progress_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

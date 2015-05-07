@@ -4,5 +4,7 @@
     <color name="feeder_blue">#ff0065d1</color>
     <color name="feeder_dark_blue">#ff244275</color>
     <color name="feeder_orange">#ffffc375</color>
+    <color name="success">#ff16b34a</color>
+    <color name="fail">#ffb3471a</color>
 
 </resources>
