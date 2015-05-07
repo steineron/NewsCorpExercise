@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical"
+             tools:context="com.newscorp.feeder.controller.QuizFragment">
+
+    <TextView
+        android:layout_margin="@dimen/margin_small"
+
+        android:textAppearance="@style/QuizProgressTextAppearance"
+        android:id="@+id/quiz_progress_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"/>
+
+    <ProgressBar
+        android:layout_margin="@dimen/margin_small"
+        android:id="@+id/quiz_remaining_time_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+
+        android:progressDrawable="@drawable/progress_bar"
+        android:max="@integer/quiz_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_margin="@dimen/margin_small"
+
+        android:id="@+id/quiz_answer_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_margin="@dimen/margin_small"
+
+        android:id="@+id/quiz_answer_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_margin="@dimen/margin_small"
+
+        android:id="@+id/quiz_answer_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
+</LinearLayout>

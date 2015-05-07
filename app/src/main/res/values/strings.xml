@@ -4,4 +4,7 @@
     <string name="action_settings">Settings</string>
     <string name="quiz_progress_text_remaining">%1$d points are coming your way</string>
     <string name="quiz_progress_text_end">You won %1$d points</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -7,6 +7,6 @@ import android.content.Context;
  */
 public interface OnFeedItemResultListener {
 
-    void onFeedItemResult(Context context, FeedItem item);
+    void onFeedItemResult(Context context, QuizFeedItem item);
     void onFeedItemFault(Context context /*and error codes*/);
 }

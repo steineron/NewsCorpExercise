@@ -13,5 +13,5 @@ interface Feed extends Parcelable {
 
     int getVersion();
 
-    FeedItem[] getItems();
+    QuizFeedItem[] getItems();
 }

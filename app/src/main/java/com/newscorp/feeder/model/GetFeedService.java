@@ -63,10 +63,10 @@ public class GetFeedService extends Service {
             return mExtras != null && mExtras.getBoolean(EXTRA_SUCCESS, false);
         }
 
-        FeedItem getFeedItem() {
+        QuizFeedItem getFeedItem() {
 
             return mExtras != null ?
-                   (FeedItem) mExtras.getParcelable(EXTRA_FEED_ITEM) :
+                   (QuizFeedItem) mExtras.getParcelable(EXTRA_FEED_ITEM) :
                    null;
         }
 
@@ -86,7 +86,7 @@ public class GetFeedService extends Service {
             receiver = new OnFeedItemResultReceiver() {
 
                 @Override
-                public void onFeedItemResult(final Context context, final FeedItem item) {
+                public void onFeedItemResult(final Context context, final QuizFeedItem item) {
 
                     listener.onFeedItemResult(context, item);
                 }
@@ -129,7 +129,7 @@ public class GetFeedService extends Service {
 
     private void broadcastNextItem() {
         boolean isSuccess = mFeed != null && mFeed.items != null && mFeed.items.length > 0;
-        FeedItemImpl feedItem = isSuccess ?
+        QuizFeedItemImpl feedItem = isSuccess ?
                                 mFeed.items[ mFeedItemIndex ] :
                                 null;
 
@@ -169,7 +169,7 @@ public class GetFeedService extends Service {
 
         int version;
 
-        FeedItemImpl[] items;
+        QuizFeedItemImpl[] items;
 
         protected FeedImpl(Parcel in) {
 
@@ -178,9 +178,9 @@ public class GetFeedService extends Service {
             version = in.readInt();
             int nItems = in.readInt();
             if (nItems > 0) {
-                items = new FeedItemImpl[ nItems ];
+                items = new QuizFeedItemImpl[ nItems ];
                 for (int i = 0; i < nItems; i++) {
-                    items[ i ] = in.readParcelable(FeedItemImpl.class.getClassLoader());
+                    items[ i ] = in.readParcelable(QuizFeedItemImpl.class.getClassLoader());
                 }
             }
         }
@@ -243,13 +243,13 @@ public class GetFeedService extends Service {
         }
 
         @Override
-        public FeedItemImpl[] getItems() {
+        public QuizFeedItemImpl[] getItems() {
 
             return items;
         }
     }
 
-    static class FeedItemImpl implements FeedItem {
+    static class QuizFeedItemImpl implements QuizFeedItem {
 
         int correctAnswerIndex;
 
@@ -263,7 +263,7 @@ public class GetFeedService extends Service {
 
         String[] headlines;
 
-        protected FeedItemImpl(Parcel in) {
+        protected QuizFeedItemImpl(Parcel in) {
 
             correctAnswerIndex = in.readInt();
             imageUrl = in.readString();
@@ -303,19 +303,19 @@ public class GetFeedService extends Service {
         }
 
         @SuppressWarnings("unused")
-        public static final Parcelable.Creator<FeedItemImpl> CREATOR =
-                new Parcelable.Creator<FeedItemImpl>() {
+        public static final Parcelable.Creator<QuizFeedItemImpl> CREATOR =
+                new Parcelable.Creator<QuizFeedItemImpl>() {
 
                     @Override
-                    public FeedItemImpl createFromParcel(Parcel in) {
+                    public QuizFeedItemImpl createFromParcel(Parcel in) {
 
-                        return new FeedItemImpl(in);
+                        return new QuizFeedItemImpl(in);
                     }
 
                     @Override
-                    public FeedItemImpl[] newArray(int size) {
+                    public QuizFeedItemImpl[] newArray(int size) {
 
-                        return new FeedItemImpl[ size ];
+                        return new QuizFeedItemImpl[ size ];
                     }
                 };
 

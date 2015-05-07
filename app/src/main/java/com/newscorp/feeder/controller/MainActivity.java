@@ -1,20 +1,24 @@
 package com.newscorp.feeder.controller;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.newscorp.feeder.R;
+import com.newscorp.feeder.model.QuizFeedItem;
 import com.newscorp.feeder.model.GetFeedService;
+import com.newscorp.feeder.model.OnFeedItemResultListener;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnFeedItemResultListener{
+
+    private QuizImageFragment mQuizImageFragment;
+
+    private QuizFragment mQuizFragment;
+
+    private QuizFeedItem mQuizFeedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,12 +26,31 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
+            mQuizImageFragment = new QuizImageFragment();
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new QuizFragment())
+                    .add(R.id.quiz_image_container, mQuizImageFragment)
+                    .commit();
+            mQuizFragment = new QuizFragment();
+            getFragmentManager().beginTransaction()
+                    .add(R.id.quiz_container, mQuizFragment)
                     .commit();
         }
     }
 
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+        if(mQuizFeedItem ==null){
+            getNextQuizItem();
+        }
+    }
+
+    private void getNextQuizItem() {
+
+        startService(GetFeedService.createNextQuizItemIntent(this));
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -52,4 +75,13 @@ public class MainActivity extends Activity {
     }
 
 
+    @Override
+    public void onFeedItemResult(final Context context, final QuizFeedItem item) {
+        mQuizFeedItem = item;
+    }
+
+    @Override
+    public void onFeedItemFault(final Context context) {
+
+    }
 }
