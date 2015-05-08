@@ -2,6 +2,7 @@ package com.newscorp.feeder.controller;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -52,6 +53,24 @@ public class QuizResultFragment extends Fragment {
                 activity.startService(GetFeedService.createNextQuizItemIntent(activity));
             }
         });
+
+        Button read = (Button) rootView.findViewById(R.id.read_it_button);
+        final String storyUrl = mQuizFeedItem.getStoryUrl();
+        if(storyUrl!=null) {
+            read.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(final View v) {
+
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(storyUrl));
+                    startActivity(i);
+                }
+            });
+        }
+        else{
+            read.setVisibility(View.GONE);
+        }
 
         TextView title = (TextView) rootView.findViewById(R.id.result_title);
         TextView standFirst = (TextView) rootView.findViewById(R.id.result_stand_first);

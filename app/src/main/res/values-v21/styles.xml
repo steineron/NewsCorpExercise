@@ -4,11 +4,11 @@
     <style name="AppTheme" parent="android:Theme.Material.Light.DarkActionBar">
         <item name="android:colorPrimary">@color/feeder_blue</item>
         <item name="android:colorPrimaryDark">@color/feeder_dark_blue</item>
-        <item name="android:colorAccent">@color/feeder_orange</item>
+        <item name="android:colorAccent">@color/feeder_pink</item>
     </style>
 
     <style name="QuizProgressTextAppearance" parent="android:TextAppearance.Material.Headline">
-        <item name="android:background">@color/feeder_orange</item>
+        <item name="android:background">@color/feeder_pink</item>
         <item name="android:gravity">center</item>
         <item name="android:padding">@dimen/margin_small</item>
     </style>
@@ -22,7 +22,7 @@
 
     <style name="QuizCaptionTextAppearance" parent="android:TextAppearance.Material.Caption">
         <item name="android:padding">@dimen/margin_small</item>
-        <item name="android:background">@color/feeder_orange</item>
+        <item name="android:background">@color/feeder_pink</item>
     </style>
 
     <style name="QuizResultTextAppearance" parent="android:TextAppearance.Material.Headline">

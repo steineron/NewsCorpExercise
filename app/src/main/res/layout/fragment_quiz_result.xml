@@ -19,6 +19,7 @@
         style="@style/QuizCaptionTextAppearance"
         />
 
+
     <TextView
         android:id="@+id/score_text"
         android:layout_width="match_parent"
@@ -28,10 +29,17 @@
         />
 
     <Button
+        android:id="@+id/read_it_button"
+        android:text="@string/read_full_article"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/feeder_pink"/>
+
+    <Button
         android:id="@+id/get_next_button"
         android:text="@string/get_next_quiz_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/feeder_orange"/>
+        android:backgroundTint="@color/feeder_pink"/>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.newscorp.feeder.controller;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.Bundle;
@@ -49,8 +50,8 @@ public class MainActivity extends Activity implements OnFeedItemResultListener, 
     protected void onResume() {
 
         super.onResume();
-        mFeedItemReceiver = GetFeedService.registerOnFeedItemResultListener(this,this);
-        mQuizEndReceiver = ControllerFacade.registerOnQuizEndedListener(this,this);
+        mFeedItemReceiver = GetFeedService.registerOnFeedItemResultListener(this, this);
+        mQuizEndReceiver = ControllerFacade.registerOnQuizEndedListener(this, this);
         if (mQuizFeedItem == null) {
             getNextQuizItem();
         }
@@ -105,12 +106,13 @@ public class MainActivity extends Activity implements OnFeedItemResultListener, 
     public void onFeedItemResult(final Context context, final QuizFeedItem item) {
 
         mQuizFeedItem = item;
-        if(mQuizResultFragment!=null){
+        if (mQuizResultFragment != null) {
             getFragmentManager()
                     .beginTransaction()
                     .remove(mQuizResultFragment)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                     .commit();
-            mQuizResultFragment=null;
+            mQuizResultFragment = null;
         }
     }
 
@@ -123,9 +125,10 @@ public class MainActivity extends Activity implements OnFeedItemResultListener, 
     public void onQuizEnded(final Context context, final QuizFeedItem item,
                             final QuizResult quizResult) {
 
-        mQuizResultFragment = new QuizResultFragment(item,quizResult);
+        mQuizResultFragment = new QuizResultFragment(item, quizResult);
         getFragmentManager().beginTransaction()
                 .add(R.id.quiz_container, mQuizResultFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }
 }

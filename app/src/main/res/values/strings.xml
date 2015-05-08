@@ -10,4 +10,5 @@
     <string name="get_next_quiz_item">Try another one</string>
     <string name="quiz_score_success">Congrats! You got %1$d points</string>
     <string name="quiz_score_fail">Comm\'on.... 0 points?!?</string>
+    <string name="read_full_article">Read full article</string>
 </resources>

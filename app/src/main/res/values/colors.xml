@@ -3,8 +3,8 @@
 
     <color name="feeder_blue">#ff0065d1</color>
     <color name="feeder_dark_blue">#ff244275</color>
-    <color name="feeder_orange">#ffffc375</color>
-    <color name="success">#ff16b34a</color>
-    <color name="fail">#ffb3471a</color>
+    <color name="feeder_pink">#ffdcabe8</color>
+    <color name="success">#ff18c451</color>
+    <color name="fail">#ffd2380e</color>
 
 </resources>
