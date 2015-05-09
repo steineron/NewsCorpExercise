@@ -367,12 +367,21 @@ public class GetFeedService extends Service {
 
             try {
                 RestTemplate restTemplate = new RestTemplate();
+
+                // hte GET is of type 'text/plain' and not 'application/json' so there's no build-in
+                // spring message-converter that can produce a POJO.
+                // ideally - i'd implement one myself using fasterxml, but given the time constrains
+                // for this exercise - i chose the 'quick-and-dirty solution:
+                // get the string, and use GSON to convert to POJO.
+
                 restTemplate.getMessageConverters()
                         .add(new StringHttpMessageConverter());
+
                 String feedStr = restTemplate.getForObject(FEED_URL, String.class);
 
                 Gson gson = new Gson();
                 FeedImpl feed = gson.fromJson(feedStr, FeedImpl.class);
+
                 return feed;
             } catch (Exception e) {
                 e.printStackTrace();
