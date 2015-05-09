@@ -4,11 +4,22 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 
 import com.newscorp.feeder.model.QuizFeedItem;
 
+import junit.framework.Assert;
+
 /**
- * Created by rosteiner on 5/7/15.
+ * {@linkplain ControllerFacade} is a facade of static methods for the controller's package.
+ * this facade exposes two events:
+ * 1. the quiz's image is loaded
+ * 2. the quiz ended
+ * <p/>
+ * components interested in these events can register a listener via the register methods of this facade.
+ * (the register methods return a {@linkplain BroadcastReceiver} that can be unregistered by any {@linkplain Context} when no longer needed)
+ * <p/>
+ * component wishing to broadcast such events can use the create methods of this facade.
  */
 public final class ControllerFacade {
 
@@ -29,13 +40,91 @@ public final class ControllerFacade {
     private static final String EXTRA_QUIZ_END_RESULT = TAG + ".EXTRA_QUIZ_END_RESULT";
 
 
+    // simple utility class for handling hte task of building an intent for quiz events
+    private static class IntentBuilder {
+
+        QuizFeedItem mQuizFeedItem;
+
+        String mAction;
+
+        private QuizResult mQuizResult;
+
+        IntentBuilder() {
+
+        }
+
+        IntentBuilder withAction(String action) {
+
+            mAction = action;
+            return this;
+        }
+
+        IntentBuilder withQuizFeedItem(QuizFeedItem quizFeedItem) {
+
+            mQuizFeedItem = quizFeedItem;
+            return this;
+        }
+
+        IntentBuilder withQuizResult(QuizResult quizResult) {
+
+            mQuizResult = quizResult;
+            return this;
+        }
+
+        Intent build() {
+
+            return new Intent(mAction)
+                    .putExtra(EXTRA_QUIZ_FEED_ITEM, mQuizFeedItem)
+                    .putExtra(EXTRA_QUIZ_END_RESULT, mQuizResult);
+        }
+
+    }
+
+    // simple utility class for handling the task of parsing an intent of quiz events
+    private static class IntentParser {
+
+        final Intent mIntent;
+
+        final Bundle mExtras;
+
+        private IntentParser(final Intent intent) {
+
+            Assert.assertNotNull(intent);
+
+            mIntent = intent;
+            mExtras = mIntent.getExtras();
+        }
+
+        String getAction() {
+
+            return mIntent.getAction();
+        }
+
+        QuizFeedItem getFeedItem() {
+
+            return mExtras == null ?
+                   null :
+                   (QuizFeedItem) mExtras.getParcelable(EXTRA_QUIZ_FEED_ITEM);
+        }
+
+        QuizResult getResult(){
+            return mExtras == null ?
+                   null :
+                   (QuizResult) mExtras.getParcelable(EXTRA_QUIZ_END_RESULT);
+
+        }
+    }
+
     /**
      * HANDLING QUIZ IMAGE LOADED
      */
 
-    public static Intent createOnQuizItemImageReadyIntent() {
+    public static Intent createOnQuizItemImageReadyIntent(QuizFeedItem quizItem) {
 
-        return new Intent(ACTION_IMAGE_READY);
+        return new IntentBuilder()
+                .withAction(ACTION_IMAGE_READY)
+                .withQuizFeedItem(quizItem)
+                .build();
     }
 
     public static BroadcastReceiver registerOnQuizItemImageReadyListener(final Context context,
@@ -46,9 +135,9 @@ public final class ControllerFacade {
             receiver = new OnQuizItemImageReadyReceiver() {
 
                 @Override
-                public void onImageReady(final Context context) {
+                public void onImageReady(final Context context, final QuizFeedItem quizFeedItem) {
 
-                    listener.onImageReady(context);
+                    listener.onImageReady(context, quizFeedItem);
                 }
             };
             IntentFilter filter = new IntentFilter();
@@ -65,8 +154,9 @@ public final class ControllerFacade {
         @Override
         public void onReceive(final Context context, final Intent intent) {
 
-            if (ACTION_IMAGE_READY.equals(intent.getAction())) {
-                onImageReady(context);
+            IntentParser parser = new IntentParser(intent);
+            if (ACTION_IMAGE_READY.equals(parser.getAction())) {
+                onImageReady(context, parser.getFeedItem());
             }
         }
     }
@@ -78,9 +168,11 @@ public final class ControllerFacade {
 
     public static Intent createOnQuizEndedIntent(QuizFeedItem quizItem, QuizResult quizResult) {
 
-        return new Intent(ACTION_QUIZ_ENDED)
-                .putExtra(EXTRA_QUIZ_FEED_ITEM, quizItem)
-                .putExtra(EXTRA_QUIZ_END_RESULT, quizResult);
+        return new IntentBuilder()
+                .withAction(ACTION_QUIZ_ENDED)
+                .withQuizFeedItem(quizItem)
+                .withQuizResult(quizResult)
+                .build();
     }
 
     public static BroadcastReceiver registerOnQuizEndedListener(final Context context,
@@ -111,10 +203,12 @@ public final class ControllerFacade {
         @Override
         public void onReceive(final Context context, final Intent intent) {
 
-            if (ACTION_QUIZ_ENDED.equals(intent.getAction())) {
+            IntentParser parser = new IntentParser(intent);
+
+            if (ACTION_QUIZ_ENDED.equals(parser.getAction())) {
                 onQuizEnded(context,
-                        (QuizFeedItem) intent.getParcelableExtra(EXTRA_QUIZ_FEED_ITEM),
-                        (QuizResult) intent.getParcelableExtra(EXTRA_QUIZ_END_RESULT));
+                        parser.getFeedItem(),
+                        parser.getResult());
             }
 
         }

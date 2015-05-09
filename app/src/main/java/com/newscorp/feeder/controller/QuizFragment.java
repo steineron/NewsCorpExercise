@@ -20,7 +20,10 @@ import com.newscorp.feeder.model.QuizFeedItem;
 import auto.parcel.AutoParcel;
 
 /**
- * A simple {@link Fragment} subclass.
+ *
+ * the fragment that handle the quiz answers, scores and time.
+ * it responds to 'new-quiz-item' and starts when the image completes loading (ready)
+ * when the quiz ends it broadcasts a 'quiz-ended' event with the quiz's result.
  */
 public class QuizFragment extends QuizBaseFragment implements OnQuizItemImageReadyListener {
 
@@ -220,9 +223,8 @@ public class QuizFragment extends QuizBaseFragment implements OnQuizItemImageRea
 
 
     @Override
-    public void onImageReady(final Context context) {
+    public void onImageReady(final Context context, final QuizFeedItem quizFeedItem) {
 
-        QuizFeedItem quizFeedItem = getQuizFeedItem();
         int length = mArrayOfAnswerViews != null && quizFeedItem != null ?
                      mArrayOfAnswerViews.length :
                      0;

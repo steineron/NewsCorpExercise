@@ -10,11 +10,13 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.animation.AnimationUtils;
 
-import com.newscorp.feeder.model.QuizFeedItem;
 import com.newscorp.feeder.model.GetFeedService;
 import com.newscorp.feeder.model.OnFeedItemResultListener;
+import com.newscorp.feeder.model.QuizFeedItem;
 
 /**
+ * a base fragment for a quiz - handles the listening action for events of 'new feed item'
+ *
  * Created by rosteiner on 5/7/15.
  */
 public abstract class QuizBaseFragment extends Fragment implements OnFeedItemResultListener {
@@ -27,7 +29,6 @@ public abstract class QuizBaseFragment extends Fragment implements OnFeedItemRes
     private QuizFeedItem mQuizFeedItem;
 
     private BroadcastReceiver mFeedReceiver;
-
 
 
     @Override
@@ -82,6 +83,8 @@ public abstract class QuizBaseFragment extends Fragment implements OnFeedItemRes
 
     @Override
     public void onFeedItemFault(final Context context) {
+
+        //TODO: cause I'm not handling a fault in this exercise....
 
     }
 

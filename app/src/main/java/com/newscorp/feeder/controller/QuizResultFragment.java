@@ -17,6 +17,11 @@ import com.newscorp.feeder.model.GetFeedService;
 import com.newscorp.feeder.model.QuizFeedItem;
 
 
+/**
+ * a fragment for displaying a quiz's result
+ * this specific implementation also triggers the 'try-another-quiz' event.
+ */
+@SuppressLint("ValidFragment")
 public class QuizResultFragment extends Fragment {
 
 

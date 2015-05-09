@@ -17,6 +17,10 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * the service that retrieves the feed for the quiz items and provides the next item upon request.
+ * components interested in the 'new-quiz-item' event can register a listener though this service's {@code registerOnFeedItemResultListener}
+ * and can trigger retrieval of the next quiz item by starting this service with the intent created by {@code createNextQuizItemIntent}
+ *
  * Created by rosteiner on 5/5/15.
  */
 public class GetFeedService extends Service {

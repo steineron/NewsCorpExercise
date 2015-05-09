@@ -13,6 +13,19 @@ import com.newscorp.feeder.model.GetFeedService;
 import com.newscorp.feeder.model.OnFeedItemResultListener;
 import com.newscorp.feeder.model.QuizFeedItem;
 
+/**
+ * {@link MainActivity} the main (and only) activity. it is responsible for setting up the layout, which in this case supports
+ * only the common handset portrait screen.
+ * it is also responsible for adding and managing the 3 fragments that provide the functionality:
+ * 1. an image fragment {@linkplain QuizImageFragment}.
+ * 2. a quiz fragment {@linkplain QuizFragment}
+ * 3. a result fragment {@linkplain QuizResultFragment}.
+ *
+ * these fragments are independent and can be arranged to exists in different layouts/order.
+ * all these fragments are aware of a {@linkplain QuizFeedItem}, to which they display an image, a quiz or a quiz's result.
+ *
+ *
+ */
 
 public class MainActivity extends Activity implements OnFeedItemResultListener, OnQuizEndedListener {
 
@@ -119,6 +132,7 @@ public class MainActivity extends Activity implements OnFeedItemResultListener, 
     @Override
     public void onFeedItemFault(final Context context) {
 
+        //TODO: cause I'm not handling a fault in this exercise....
     }
 
     @Override

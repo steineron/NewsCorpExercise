@@ -18,6 +18,9 @@ import com.newscorp.feeder.model.QuizFeedItem;
 import com.newscorp.feeder.model.VolleyWrapper;
 
 /**
+ * a fragment that is responsible for diplaying hte image a the quiz.
+ * the fragment responds to 'new quiz item' by loading the image, and broadcasting an event that the image is ready.
+ *
  * Created by rosteiner on 5/5/15.
  */
 public class QuizImageFragment extends QuizBaseFragment {
@@ -40,21 +43,21 @@ public class QuizImageFragment extends QuizBaseFragment {
     @Override
     public void onFeedItemResult(final Context context, final QuizFeedItem item) {
 
-        super.onFeedItemResult(context,item);
+        super.onFeedItemResult(context, item);
         getPreviewImageForFeedItem(item);
     }
 
 
     @Override
     public void onFeedItemFault(final Context context) {
-
+        //TODO: cause I'm not handling a fault in this exercise....
     }
 
     @Override
     protected void cancelQuiz() {
 
         synchronized (this) {
-            if(mImageRequest!=null){
+            if (mImageRequest != null) {
                 try {
                     mImageRequest.cancel();
                 } catch (Exception e) {
@@ -90,7 +93,11 @@ public class QuizImageFragment extends QuizBaseFragment {
                             synchronized (QuizImageFragment.this) {
                                 mImageRequest = null;
                             }
-                            getActivity().sendBroadcast(ControllerFacade.createOnQuizItemImageReadyIntent());
+                            getActivity().sendBroadcast(
+                                    ControllerFacade
+                                            .createOnQuizItemImageReadyIntent(
+                                                    getQuizFeedItem())
+                                                       );
 
                         }
 
